@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Baldi's Basics Clone</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.01,
+        1000
+      );
+
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const light = new THREE.AmbientLight(0x404040, 5); // soft white light
+      scene.add(light);
+
+      // Configuración de controles de movimiento
+      const controls = new THREE.PointerLockControls(camera, document.body);
+
+      let ruta_de_audio = "Baldisbasicsthemesong.mp3";
+      let audio = new Audio(ruta_de_audio);
+      audio.loop = true;
+
+      document.addEventListener("click", () => {
+        controls.lock();
+        audio.play();
+      });
+
+      const loader = new THREE.GLTFLoader();
+
+      loader.load(
+        "school.glb",
+        function (gltf) {
+          scene.add(gltf.scene);
+          gltf.scene.scale.set(1500, 1500, 1500);
+          gltf.scene.position.set(0, 300, 0);
+        },
+        undefined,
+        function (error) {
+          console.error(error);
+        }
+      );
+
+      const textureLoader = new THREE.TextureLoader();
+      const desktopTexture = textureLoader.load("desktop.jpeg");
+      const geometry = new THREE.BoxGeometry(20, 10, 10);
+      const material = new THREE.MeshBasicMaterial({
+        map: desktopTexture,
+        side: THREE.DoubleSide,
+      });
+      const desktop = new THREE.Mesh(geometry, material);
+      scene.add(desktop);
+
+      desktop.position.set(0, -7, 0);
+
+      const loader2 = new THREE.GLTFLoader();
+
+      loader2.load(
+        "baldi.glb",
+        function (gltf2) {
+          scene.add(gltf2.scene);
+          gltf2.scene.scale.set(3, 3, 3);
+          gltf2.scene.position.set(30, -15, 0);
+          gltf2.scene.rotation.set(0, 51, 0); // La rotación en ejes X, Y y Z
+        },
+        undefined,
+        function (error) {
+          console.error(error);
+        }
+      );
+
+      let moveForward = false,
+        moveBackward = false,
+        moveLeft = false,
+        moveRight = false;
+
+      const move = new THREE.Vector3(); // Inicializar vector de movimiento
+
+      const onKeyDown = (event) => {
+        switch (event.code) {
+          case "ArrowUp":
+          case "KeyW":
+            moveForward = true;
+            break;
+          case "ArrowLeft":
+          case "KeyA":
+            moveLeft = false;
+            break;
+          case "ArrowDown":
+          case "KeyS":
+            moveBackward = true;
+            break;
+          case "ArrowRight":
+          case "KeyD":
+            moveRight = false;
+            break;
+        }
+      };
+
+      const onKeyUp = (event) => {
+        switch (event.code) {
+          case "ArrowUp":
+          case "KeyW":
+            moveForward = false;
+            break;
+          case "ArrowLeft":
+          case "KeyA":
+            moveLeft = true;
+            break;
+          case "ArrowDown":
+          case "KeyS":
+            moveBackward = false;
+            break;
+          case "ArrowRight":
+          case "KeyD":
+            moveRight = true;
+            break;
+        }
+      };
+
+      document.addEventListener("keydown", onKeyDown);
+      document.addEventListener("keyup", onKeyUp);
+
+      camera.position.z = 20;
+
+      let delta = 1;
+
+      let array_numeros_1 = [];
+      let array_numeros_2 = [];
+      let array_numeros_3 = [];
+      let array_numeros_4 = [];
+      let operadores = ["+", "-", "*", "/"];
+
+      for (let i = 0; i <= 10; i++) {
+        array_numeros_1.push(i);
+      }
+
+      for (let ii = 0; ii <= 10; ii++) {
+        array_numeros_2.push(ii);
+      }
+
+      for (let iii = 0; iii <= 10; iii++) {
+        array_numeros_3.push(iii);
+      }
+
+      for (let iiii = 0; iiii <= 10; iiii++) {
+        array_numeros_4.push(iiii);
+      }
+
+      function checkCollisions() {
+        const desktopDistance = camera.position.distanceTo(desktop.position);
+        if (desktopDistance < 10) {
+          // Indices aleatorios
+          let indiceAleatorio_1 = Math.floor(
+            Math.random() * array_numeros_1.length
+          );
+          let indiceAleatorio_2 = Math.floor(
+            Math.random() * array_numeros_2.length
+          );
+          let indiceAleatorio_3 = Math.floor(
+            Math.random() * array_numeros_3.length
+          );
+          let indiceAleatorio_4 = Math.floor(
+            Math.random() * array_numeros_4.length
+          );
+          let indiceAleatorio_5 = Math.floor(Math.random() * operadores.length);
+          let indiceAleatorio_6 = Math.floor(Math.random() * operadores.length);
+          let indiceAleatorio_7 = Math.floor(Math.random() * operadores.length);
+
+          // Declaración de los valores
+          let num1_aleatorio = array_numeros_1[indiceAleatorio_1];
+          let num2_aleatorio = array_numeros_2[indiceAleatorio_2];
+          let num3_aleatorio = array_numeros_3[indiceAleatorio_3];
+          let num4_aleatorio = array_numeros_4[indiceAleatorio_4];
+          let operador1_aleatorio = operadores[indiceAleatorio_5];
+          let operador2_aleatorio = operadores[indiceAleatorio_6];
+          let operador3_aleatorio = operadores[indiceAleatorio_7];
+          let operacion1;
+          let operacion2;
+          let operacion_completa;
+
+          // Umbral para valores pequeños
+          const umbralPequeno = 1e-5;
+
+          // Operaciones con verificación de Infinity, números grandes y pequeños
+          function verificarResultado(operacion) {
+            // Si la operación da Infinity, es demasiado grande, o es muy pequeña, devolvemos NaN
+            if (
+              Math.abs(operacion) === Infinity ||
+              Math.abs(operacion) > 1e6 ||
+              Math.abs(operacion) < umbralPequeno
+            ) {
+              return NaN; // Resultado no válido
+            }
+            return operacion; // Si es un resultado válido, lo devolvemos
+          }
+
+          // Realización de las operaciones
+          if (operador1_aleatorio === "+") {
+            operacion1 = num1_aleatorio + num2_aleatorio;
+          } else if (operador1_aleatorio === "-") {
+            operacion1 = num1_aleatorio - num2_aleatorio;
+          } else if (operador1_aleatorio === "*") {
+            operacion1 = num1_aleatorio * num2_aleatorio;
+          } else if (operador1_aleatorio === "/") {
+            // Evitar división por cero
+            if (num2_aleatorio !== 0) {
+              operacion1 = num1_aleatorio / num2_aleatorio;
+            } else {
+              operacion1 = NaN; // División por cero
+            }
+          }
+
+          if (operador3_aleatorio === "+") {
+            operacion2 = num3_aleatorio + num4_aleatorio;
+          } else if (operador3_aleatorio === "-") {
+            operacion2 = num3_aleatorio - num4_aleatorio;
+          } else if (operador3_aleatorio === "*") {
+            operacion2 = num3_aleatorio * num4_aleatorio;
+          } else if (operador3_aleatorio === "/") {
+            // Evitar división por cero
+            if (num4_aleatorio !== 0) {
+              operacion2 = num3_aleatorio / num4_aleatorio;
+            } else {
+              operacion2 = NaN; // División por cero
+            }
+          }
+
+          // Si las operaciones resultan en un valor no válido, salir
+          if (isNaN(operacion1) || isNaN(operacion2)) {
+            return; // Evitamos operaciones no válidas
+          }
+
+          // Realizar la operación final
+          if (operador2_aleatorio === "+") {
+            operacion_completa = operacion1 + operacion2;
+          } else if (operador2_aleatorio === "-") {
+            operacion_completa = operacion1 - operacion2;
+          } else if (operador2_aleatorio === "*") {
+            operacion_completa = operacion1 * operacion2;
+          } else if (operador2_aleatorio === "/") {
+            // Evitar división por cero
+            if (operacion2 !== 0) {
+              operacion_completa = operacion1 / operacion2;
+            } else {
+              operacion_completa = NaN; // División por cero
+            }
+          }
+
+          // Verificar si la operación completa es un número válido
+          operacion_completa = verificarResultado(operacion_completa);
+
+          // Si la operación es inválida (Infinity, NaN, demasiado grande o pequeña), no la mostramos
+          if (isNaN(operacion_completa)) {
+            return; // Evitamos mostrar una operación inválida
+          }
+
+          // Mostrar la operación al usuario
+          let entrada_de_usuario = prompt(
+            "Operación por calcular: " +
+              num1_aleatorio +
+              operador1_aleatorio +
+              num2_aleatorio +
+              operador2_aleatorio +
+              num3_aleatorio +
+              operador3_aleatorio +
+              num4_aleatorio
+          );
+
+          // Verificación de la respuesta
+          if (parseInt(entrada_de_usuario) === operacion_completa) {
+            alert("Correcto.");
+          } else {
+            alert("Incorrecto, el resultado era: " + operacion_completa);
+            ruta_de_audio = "perdiste.mp3";
+            audio = new Audio(ruta_de_audio);
+            audio.loop = true;
+            audio.play();
+          }
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        if (controls.isLocked === true) {
+          const direction = new THREE.Vector3();
+
+          camera.getWorldDirection(direction);
+          direction.y = 0; // Ignorar la componente Y de la dirección
+          direction.normalize(); // Normalizar la dirección para mantener una velocidad constante
+
+          move.set(0, 0, 0); // Reiniciar el vector de movimiento
+
+          if (moveForward) {
+            move.add(direction.clone().multiplyScalar(delta));
+          }
+          if (moveBackward) {
+            move.add(direction.clone().multiplyScalar(-delta));
+          }
+          if (moveLeft) {
+            move.add(
+              new THREE.Vector3(-direction.z, 0, direction.x).multiplyScalar(
+                delta
+              )
+            );
+          }
+          if (moveRight) {
+            move.add(
+              new THREE.Vector3(direction.z, 0, -direction.x).multiplyScalar(
+                delta
+              )
+            );
+          }
+
+          camera.position.add(move);
+        }
+
+        // Llamar a la función checkCollisions
+        checkCollisions();
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      window.addEventListener("resize", () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      });
+    </script>
+  </body>
+</html>
